@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import mealRepository from "../repositories/mealRepository";
-import { MealParams } from "../protocols/mealProtocol";
+import mealRepository from "../repositories/mealRepository.js";
+import { MealParams } from "../protocols/mealProtocol.js";
 
 async function create(req: Request, res: Response, next: NextFunction) {
   const newMeal: MealParams = req.body;
