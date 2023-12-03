@@ -2,9 +2,8 @@ import { openDb } from "../config/database.js";
 import { CreateMealParams } from "../protocols/mealProtocol.js";
 
 async function createMeal(order: CreateMealParams) {
-  openDb().then((db) => {
-    db.run("INSERT INTO meals (customer) VALUES (?)", order.customer);
-  });
+  const db = await openDb();
+  await db.run("INSERT INTO meals (customer) VALUES (?)", order.customer);
   const mealId = await getLatestMealId();
 
   await createProducts(order, mealId.id);
