@@ -1,13 +1,21 @@
 import { NextFunction, Request, Response } from "express";
 import mealRepository from "../repositories/mealRepository.js";
-import { MealParams } from "../protocols/mealProtocol.js";
+import { CreateMealParams } from "../protocols/mealProtocol.js";
 
 async function create(req: Request, res: Response, next: NextFunction) {
-  const newMeal: MealParams = req.body;
+  const newMeal: CreateMealParams = req.body;
   try {
     await mealRepository.createMeal(newMeal);
+    res.sendStatus(201);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+}
+
+async function getAll(req: Request, res: Response, next: NextFunction) {
+  try {
     const meals = await mealRepository.getAll();
-    res.status(201).send(meals);
+    res.status(200).send(meals);
   } catch (err) {
     return res.status(500).send(err.message);
   }
@@ -39,4 +47,5 @@ export default {
   create,
   update,
   remove,
+  getAll,
 };

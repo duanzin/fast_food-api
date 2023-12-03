@@ -5,8 +5,9 @@ import { mealSchema } from "../schemas/mealSchema.js";
 
 const mealRouter = Router();
 
+mealRouter.get("/", mealController.getAll);
 mealRouter.post("/", validateSchema(mealSchema), mealController.create);
-mealRouter.patch("/update/:id", mealController.update);
-mealRouter.delete("/remove/:id", mealController.remove);
+mealRouter.patch("/:id", mealController.update);
+mealRouter.delete("/:id", mealController.remove);
 
 export default mealRouter;

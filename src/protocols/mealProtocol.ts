@@ -1,9 +1,9 @@
-export type MealParams = {
-  id: number;
-  product: string;
+export type Product  = {
+  name: string;
   quantity: number;
-  customer: string;
-  status: boolean;
-};
+}
 
-export type CreateMealParams = Omit<MealParams, "id" | "status">;
+export type CreateMealParams = {
+  customer: string;
+  products: Product[];
+}
