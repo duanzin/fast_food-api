@@ -8,16 +8,16 @@ async function createTable() {
     db.exec(
       `
       CREATE TABLE IF NOT EXISTS meals (
-        id INTEGER PRIMARY KEY,
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         customer TEXT NOT NULL,
         status BOOLEAN DEFAULT false
       );
       
       CREATE TABLE IF NOT EXISTS products (
-        id INTEGER PRIMARY KEY,
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         quantity TEXT NOT NULL,
-        meal_id INTEGER,
+        meal_id INTEGER NOT NULL,
         FOREIGN KEY (meal_id) REFERENCES meals (id)
       );
       `
