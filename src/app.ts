@@ -10,6 +10,7 @@ async function createTable() {
       CREATE TABLE IF NOT EXISTS meals (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         customer TEXT NOT NULL,
+        observation TEXT,
         status BOOLEAN DEFAULT false
       );
       

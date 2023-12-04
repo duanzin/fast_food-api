@@ -1,9 +1,12 @@
 import { openDb } from "../config/database.js";
-import { CreateMealParams } from "../protocols/mealProtocol.js";
+import { CreateMealParams, ReceiveMealParams } from "../protocols/mealProtocol.js";
 
 async function createMeal(order: CreateMealParams) {
   const db = await openDb();
-  await db.run("INSERT INTO meals (customer) VALUES (?)", order.customer);
+  await db.run("INSERT INTO meals (customer, observation) VALUES (?,?)", [
+    order.customer,
+    order.observation,
+  ]);
   const mealId = await getLatestMealId();
 
   await createProducts(order, mealId.id);
@@ -40,12 +43,12 @@ async function removeMeal(id: number) {
   await db.close();
 }
 
-async function getAll() {
+async function getAll(): Promise<ReceiveMealParams[]>{
   return openDb().then((db) => {
     return db
       .all(
         `
-      SELECT meals.id AS mealId, customer, status, products.id AS productId, name, quantity
+      SELECT meals.id AS mealId, customer, observation, status, products.id AS productId, name, quantity
       FROM meals
       LEFT JOIN products ON meals.id = products.meal_id
     `
@@ -58,6 +61,7 @@ async function getAll() {
             currentMeal = {
               id: row.mealId,
               customer: row.customer,
+              observation: row.observation,
               status: row.status,
               products: [],
             };

@@ -3,6 +3,7 @@ import { CreateMealParams, Product } from "../protocols/mealProtocol.js";
 
 export const mealSchema = Joi.object<CreateMealParams>({
   customer: Joi.string().required(),
+  observation: Joi.string().optional(),
   products: Joi.array()
     .items(
       Joi.object<Product>({
