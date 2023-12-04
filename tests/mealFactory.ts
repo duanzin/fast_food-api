@@ -1,7 +1,7 @@
-import { openDb } from "../src/config/database.js";
+import { openDb } from "../src/config/database";
 import { faker } from "@faker-js/faker";
 import mealRepository from "../src/repositories/mealRepository";
-import { ReceiveMealParams } from "protocols/mealProtocol";
+import { ReceiveMealParams } from "../src/protocols/mealProtocol";
 
 export async function createMealforTest(): Promise<ReceiveMealParams> {
   await mealRepository.createMeal({

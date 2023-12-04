@@ -11,12 +11,16 @@ export function handleApplicationErrors(
   res: Response,
   next: NextFunction
 ) {
-  if (err.name === "BadRequestError") {
-    return sendErrorResponse(res, httpStatus.BAD_REQUEST, err.message);
-  }
-
   if (err.name === "ValidationError") {
     return sendErrorResponse(res, httpStatus.UNPROCESSABLE_ENTITY, err.message);
+  }
+
+  if (err.name === "NotFoundError") {
+    return sendErrorResponse(res, httpStatus.NOT_FOUND, err.message);
+  }
+
+  if (err.name === "BadRequestError") {
+    return sendErrorResponse(res, httpStatus.BAD_REQUEST, err.message);
   }
 
   return sendErrorResponse(res, httpStatus.INTERNAL_SERVER_ERROR, err.message);

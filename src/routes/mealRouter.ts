@@ -1,7 +1,7 @@
 import { Router } from "express";
-import mealController from "../controllers/mealController.js";
-import { validateSchema } from "../middlewares/validateSchema.js";
-import { mealSchema } from "../schemas/mealSchema.js";
+import mealController from "../controllers/mealController";
+import { validateSchema } from "../middlewares/validateSchema";
+import { mealSchema } from "../schemas/mealSchema";
 
 const mealRouter = Router();
 

@@ -1,4 +1,4 @@
-import { openDb } from "../src/config/database.js";
+import { openDb } from "../src/config/database";
 
 export async function cleanDB() {
   const db = await openDb();

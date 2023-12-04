@@ -1,8 +1,8 @@
-import { openDb } from "./config/database.js";
+import { openDb } from "./config/database";
 import express from "express";
 import cors from "cors";
-import mealRouter from "./routes/mealRouter.js";
-import { handleApplicationErrors } from "./middlewares/errorHandlingMiddleware.js";
+import mealRouter from "./routes/mealRouter";
+import { handleApplicationErrors } from "./middlewares/errorHandlingMiddleware";
 
 async function createTable() {
   openDb().then((db) => {
@@ -18,7 +18,7 @@ async function createTable() {
       CREATE TABLE IF NOT EXISTS products (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        quantity TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
         meal_id INTEGER NOT NULL,
         FOREIGN KEY (meal_id) REFERENCES meals (id)
       );
