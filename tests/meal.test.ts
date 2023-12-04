@@ -91,7 +91,7 @@ describe("PATCH /:id", () => {
   it("should respond with status 200 and array of objects when theres an element with given id", async () => {
     const testMeal = await createMealforTest();
 
-    const response = await server.delete(`/${testMeal.id}`);
+    const response = await server.patch(`/${testMeal.id}`);
 
     expect(response.status).toBe(httpStatus.OK);
     expect(response.body).toEqual(
@@ -100,6 +100,7 @@ describe("PATCH /:id", () => {
           id: expect.any(Number),
           customer: expect.any(String),
           observation: expect.any(String),
+          status: expect.any(Number),
           products: [
             {
               name: expect.any(String),
@@ -137,6 +138,7 @@ describe("DELETE /:id", () => {
           id: expect.any(Number),
           customer: expect.any(String),
           observation: expect.any(String),
+          status: expect.any(Number),
           products: [
             {
               name: expect.any(String),
