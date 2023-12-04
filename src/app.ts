@@ -34,3 +34,5 @@ app.use(cors()).use(express.json()).use(mealRouter);
 
 const port = 5000;
 app.listen(port, () => console.log(`Server running in port: ${port}`));
+
+export default app;
