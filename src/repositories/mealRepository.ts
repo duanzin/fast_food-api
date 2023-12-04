@@ -1,5 +1,9 @@
-import { openDb } from "../config/database.js";
-import { CreateMealParams, ReceiveMealParams } from "../protocols/mealProtocol.js";
+import { notFoundError } from "../errors/index";
+import { openDb } from "../config/database";
+import {
+  CreateMealParams,
+  ReceiveMealParams,
+} from "../protocols/mealProtocol";
 
 async function createMeal(order: CreateMealParams) {
   const db = await openDb();
@@ -30,20 +34,26 @@ async function createProducts(order: CreateMealParams, mealId: number) {
 }
 
 async function updateMeal(id: number) {
-  openDb().then((db) => {
-    db.run(`UPDATE meals SET status=? WHERE id=?`, true, id);
-  });
+  const db = await openDb();
+
+  const existingMeal = await db.get("SELECT * FROM meals WHERE id = ?", id);
+  if (!existingMeal) throw notFoundError();
+
+  await db.run("UPDATE meals SET status = ? WHERE id = ?", true, id);
 }
 
 async function removeMeal(id: number) {
   const db = await openDb();
+
+  const existingMeal = await db.get("SELECT * FROM meals WHERE id = ?", id);
+  if (!existingMeal) throw notFoundError();
 
   await db.run(`DELETE FROM products WHERE meal_id=?`, [id]);
   await db.run(`DELETE FROM meals WHERE id=?`, [id]);
   await db.close();
 }
 
-async function getAll(): Promise<ReceiveMealParams[]>{
+async function getAll(): Promise<ReceiveMealParams[]> {
   return openDb().then((db) => {
     return db
       .all(

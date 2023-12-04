@@ -1,3 +1,4 @@
+import { validationError } from "errors";
 import { NextFunction, Request, Response } from "express";
 import { Schema } from "joi";
 
@@ -6,7 +7,7 @@ export function validateSchema(schema: Schema) {
     const { error } = schema.validate(req.body, { abortEarly: false });
 
     if (error) {
-      res.status(422).send(error.details);
+      throw validationError(error.details);
     } else {
       next();
     }
