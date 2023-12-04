@@ -16,3 +16,9 @@ To start the code, run the following command
 ```
 npm run dev
 ```
+
+To run tests, input the following command
+
+```
+npm t
+```
