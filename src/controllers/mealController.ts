@@ -8,7 +8,7 @@ async function create(req: Request, res: Response, next: NextFunction) {
     await mealRepository.createMeal(newMeal);
     res.sendStatus(201);
   } catch (err) {
-    return res.status(500).send(err.message);
+    return next(err);
   }
 }
 
@@ -17,7 +17,7 @@ async function getAll(req: Request, res: Response, next: NextFunction) {
     const meals = await mealRepository.getAll();
     res.status(200).send(meals);
   } catch (err) {
-    return res.status(500).send(err.message);
+    return next(err);
   }
 }
 
@@ -28,7 +28,7 @@ async function update(req: Request, res: Response, next: NextFunction) {
     const meals = await mealRepository.getAll();
     res.status(200).send(meals);
   } catch (err) {
-    return res.status(500).send(err.message);
+    return next(err);
   }
 }
 
@@ -39,7 +39,7 @@ async function remove(req: Request, res: Response, next: NextFunction) {
     const meals = await mealRepository.getAll();
     res.status(200).send(meals);
   } catch (err) {
-    return res.status(500).send(err.message);
+    return next(err);
   }
 }
 

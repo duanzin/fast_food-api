@@ -2,6 +2,7 @@ import { openDb } from "./config/database.js";
 import express from "express";
 import cors from "cors";
 import mealRouter from "./routes/mealRouter.js";
+import { handleApplicationErrors } from "./middlewares/errorHandlingMiddleware.js";
 
 async function createTable() {
   openDb().then((db) => {
@@ -30,7 +31,11 @@ openDb();
 createTable();
 
 const app = express();
-app.use(cors()).use(express.json()).use(mealRouter);
+app
+  .use(cors())
+  .use(express.json())
+  .use(mealRouter)
+  .use(handleApplicationErrors);
 
 const port = 5000;
 app.listen(port, () => console.log(`Server running in port: ${port}`));
