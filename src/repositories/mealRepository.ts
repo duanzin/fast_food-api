@@ -60,18 +60,31 @@ async function getAll(): Promise<ReceiveMealParams[]> {
 
   const rows = result.rows;
 
-  const mealsData = rows.map((row) => {
-    return {
-      id: row.mealid,
-      customer: row.customer,
-      observation: row.observation,
-      status: row.status,
-      products:
-        row.productid !== null
-          ? [{ name: row.name, quantity: row.quantity }]
-          : [],
-    };
+  const mealsDataMap: Record<number, ReceiveMealParams> = {};
+
+  rows.forEach((row) => {
+    const mealId = row.mealid;
+    const product =
+      row.productId !== null
+        ? { name: row.name, quantity: row.quantity }
+        : null;
+
+    if (!(mealId in mealsDataMap)) {
+      mealsDataMap[mealId] = {
+        id: mealId,
+        customer: row.customer,
+        observation: row.observation,
+        status: row.status,
+        products: product ? [product] : [],
+      };
+    } else {
+      if (product) {
+        mealsDataMap[mealId].products.push(product);
+      }
+    }
   });
+
+  const mealsData = Object.values(mealsDataMap);
 
   return mealsData;
 }
