@@ -22,3 +22,4 @@ To run tests, input the following command
 ```
 npm t
 ```
+Be warned, running tests will delete all items on database and insert elements with unusual looking values
