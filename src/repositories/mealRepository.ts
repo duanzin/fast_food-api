@@ -1,96 +1,92 @@
 import { notFoundError } from "../errors/index";
-import { openDb } from "../config/database";
-import {
-  CreateMealParams,
-  ReceiveMealParams,
-} from "../protocols/mealProtocol";
+import { db } from "../config/database";
+import { QueryResult } from "pg";
+import { CreateMealParams, ReceiveMealParams } from "../protocols/mealProtocol";
 
 async function createMeal(order: CreateMealParams) {
-  const db = await openDb();
-  await db.run("INSERT INTO meals (customer, observation) VALUES (?,?)", [
-    order.customer,
-    order.observation,
-  ]);
-  const mealId = await getLatestMealId();
+  const result: QueryResult<{ id: number }> = await db.query(
+    "INSERT INTO meals (customer, observation) VALUES ($1, $2) RETURNING id",
+    [order.customer, order.observation]
+  );
+  const mealId: number = result.rows[0].id;
 
-  await createProducts(order, mealId.id);
-}
-
-async function getLatestMealId() {
-  return openDb().then((db) => {
-    return db.get("SELECT id FROM meals ORDER BY id DESC LIMIT 1");
-  });
+  await createProducts(order, mealId);
 }
 
 async function createProducts(order: CreateMealParams, mealId: number) {
-  openDb().then((db) => {
-    for (const product of order.products) {
-      db.run(
-        "INSERT INTO products (name, quantity, meal_id) VALUES (?, ?, ?)",
-        [product.name, product.quantity, mealId]
-      );
-    }
-  });
+  for (const product of order.products) {
+    await db.query(
+      "INSERT INTO products (name, quantity, meal_id) VALUES ($1, $2, $3)",
+      [product.name, product.quantity, mealId]
+    );
+  }
 }
 
 async function updateMeal(id: number) {
-  const db = await openDb();
+  const existingMealResult = await db.query(
+    "SELECT * FROM meals WHERE id = $1",
+    [id]
+  );
 
-  const existingMeal = await db.get("SELECT * FROM meals WHERE id = ?", id);
-  if (!existingMeal) throw notFoundError();
+  if (existingMealResult.rows.length === 0) {
+    throw notFoundError();
+  }
 
-  await db.run("UPDATE meals SET status = ? WHERE id = ?", true, id);
+  await db.query("UPDATE meals SET status = $1 WHERE id = $2", [true, id]);
 }
 
 async function removeMeal(id: number) {
-  const db = await openDb();
+  const existingMealResult = await db.query(
+    "SELECT * FROM meals WHERE id = $1",
+    [id]
+  );
 
-  const existingMeal = await db.get("SELECT * FROM meals WHERE id = ?", id);
-  if (!existingMeal) throw notFoundError();
+  if (existingMealResult.rows.length === 0) {
+    throw notFoundError();
+  }
 
-  await db.run(`DELETE FROM products WHERE meal_id=?`, [id]);
-  await db.run(`DELETE FROM meals WHERE id=?`, [id]);
-  await db.close();
+  await db.query("DELETE FROM products WHERE meal_id = $1", [id]);
+  await db.query("DELETE FROM meals WHERE id = $1", [id]);
 }
 
 async function getAll(): Promise<ReceiveMealParams[]> {
-  return openDb().then((db) => {
-    return db
-      .all(
-        `
-      SELECT meals.id AS mealId, customer, observation, status, products.id AS productId, name, quantity
-      FROM meals
-      LEFT JOIN products ON meals.id = products.meal_id
+  const result = await db.query(
     `
-      )
-      .then((rows) => {
-        const mealsData = rows.reduce((acc, row) => {
-          let currentMeal = acc.find((meal) => meal.id === row.mealId);
+    SELECT meals.id AS mealId, customer, observation, status, products.id AS productId, name, quantity
+    FROM meals
+    LEFT JOIN products ON meals.id = products.meal_id
+  `
+  );
 
-          if (!currentMeal) {
-            currentMeal = {
-              id: row.mealId,
-              customer: row.customer,
-              observation: row.observation,
-              status: row.status,
-              products: [],
-            };
-            acc.push(currentMeal);
-          }
+  const rows = result.rows;
 
-          if (row.productId !== null) {
-            currentMeal.products.push({
-              name: row.name,
-              quantity: row.quantity,
-            });
-          }
+  const mealsDataMap: Record<number, ReceiveMealParams> = {};
 
-          return acc;
-        }, []);
+  rows.forEach((row) => {
+    const mealId = row.mealid;
+    const product =
+      row.productId !== null
+        ? { name: row.name, quantity: row.quantity }
+        : null;
 
-        return mealsData;
-      });
+    if (!(mealId in mealsDataMap)) {
+      mealsDataMap[mealId] = {
+        id: mealId,
+        customer: row.customer,
+        observation: row.observation,
+        status: row.status,
+        products: product ? [product] : [],
+      };
+    } else {
+      if (product) {
+        mealsDataMap[mealId].products.push(product);
+      }
+    }
   });
+
+  const mealsData = Object.values(mealsDataMap);
+
+  return mealsData;
 }
 
 export default {

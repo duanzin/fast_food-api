@@ -11,4 +11,5 @@ export interface CreateMealParams {
 
 export interface ReceiveMealParams extends CreateMealParams {
   id: number;
+  status: boolean;
 }
