@@ -30,7 +30,9 @@ describe("POST /", () => {
     const generateValidBody = () => ({
       customer: faker.person.firstName(),
       observation: faker.lorem.paragraph(),
-      products: [{ name: faker.lorem.word(), quantity: faker.number.int() }],
+      products: [
+        { name: faker.lorem.word(), quantity: faker.number.int({ max: 99 }) },
+      ],
     });
 
     it("should respond with status 201", async () => {
@@ -69,7 +71,7 @@ describe("GET /", () => {
             quantity: expect.any(Number),
           },
         ],
-        status: 0,
+        status: false,
       },
     ]);
   });
@@ -100,7 +102,7 @@ describe("PATCH /:id", () => {
           id: expect.any(Number),
           customer: expect.any(String),
           observation: expect.any(String),
-          status: expect.any(Number),
+          status: expect.any(Boolean),
           products: [
             {
               name: expect.any(String),
@@ -138,7 +140,7 @@ describe("DELETE /:id", () => {
           id: expect.any(Number),
           customer: expect.any(String),
           observation: expect.any(String),
-          status: expect.any(Number),
+          status: expect.any(Boolean),
           products: [
             {
               name: expect.any(String),

@@ -1,9 +1,6 @@
-import { openDb } from "../src/config/database";
+import { db } from "../src/config/database";
 
 export async function cleanDB() {
-  const db = await openDb();
-
-  await db.run(`DELETE FROM products`);
-  await db.run(`DELETE FROM meals`);
-  await db.close();
+  await db.query(`TRUNCATE TABLE products RESTART IDENTITY CASCADE`);
+  await db.query(`TRUNCATE TABLE meals RESTART IDENTITY CASCADE`);
 }
